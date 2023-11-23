@@ -86,32 +86,29 @@ def insert_user(user_id, name, soName, group):
 
 def get_user_data(user_id):
     try:
-        db = mysql.connector.connect(
+        with mysql.connector.connect(
             host="127.0.0.1",
             port=3308,
             user="root",
             password="654780Jdm!",
             database="hacaton"
-        )
-        cursor = db.cursor()
-        cursor.execute("SELECT * FROM Users WHERE user_id=%s", (user_id,))
-        user_data = cursor.fetchone()
+        ) as db:
+            cursor = db.cursor()
+            cursor.execute("SELECT * FROM users WHERE user_id=%s", (user_id,))
+            user_data = cursor.fetchone()
 
-        if user_data:
-            return {
-                'user_id': user_data[0],
-                'username': user_data[1],
-                'login': user_data[2],
-                'role': user_data[3],
-                'id': user_data[4],
-                'student_group_id': user_data[5],
-            }
-        else:
-            return None
+            if user_data:
+                return {
+                    'user_id': user_data[0],
+                    'username': user_data[1],
+                    'login': user_data[2],
+                    'role': user_data[3],
+                    'id': user_data[4],
+                    'student_group_id': user_data[5],
+                }
+            else:
+                return None
 
-    except Exception as e:
-        print(f"Error while executing the query: {e}")
-
-    finally:
-        if db is not None and db.is_connected():
-            db.close()
+    except mysql.connector.Error as err:
+        print(f"Error while executing the query: {err}")
+        return None

@@ -79,49 +79,23 @@ async def process_group(message: types.Message, state: FSMContext):
     await message.answer("Регистрация завершена. Спасибо!")
     await state.finish()
 
-##########################################################################################
 
+##########################################################################################
 @dp.message_handler(commands=['status'])
 async def status(message: types.Message):
     user_id = message.from_user.id
-    user_data = await get_user_data(user_id)
+    user_data = SQLset.get_user_data(user_id)
 
     if user_data:
-        status_text = f"Статус пользователя {user_data['name']} {user_data['soName']}: {user_data['group']}"
+        status_text = f"Статус пользователя {user_data['username']} {user_data['login']}: {user_data['role']}"
     else:
         status_text = "Пользователь не найден."
 
     await message.answer(status_text)
 
-async def get_user_data(user_id: int) -> dict:
-    conn = None  
-    try:
-        conn = sqlite3.connect('QslBD.db')
-        cursor = conn.cursor()
+#########################################################################################
 
-        cursor.execute("SELECT * FROM users WHERE id=?", (user_id,))
-        user_data = cursor.fetchone()
 
-        if user_data:
-            return {
-                'id': user_data[0],
-                'name': user_data[1],
-                'soName': user_data[2],
-                'group': user_data[3],
-            }
-        else:
-            try:
-                if conn:
-                    conn.close()
-            except UnboundLocalError:
-                pass 
-
-    except sqlite3.Error as e:
-        print(f"Ошибка при выполнении запроса: {e}")
-
-    finally:
-        if conn:
-            conn.close()
 
 if __name__ == '__main__':
     from aiogram import executor
