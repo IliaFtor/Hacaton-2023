@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Управление группами и студентами</title>
+</head>
+<body>
+    <div class="container">
+        <!-- Список групп -->
+        <h2>Группы</h2>
+        <ul id="group-list"></ul>
+        <a href="#" class="create-group-btn" onclick="toggleGroupForm()">Создать группу</a>
+        <div id="group-form" class="group-form">
+            <!-- Форма для создания группы -->
+            <label for="group-name">Название группы:</label>
+            <input type="text" id="group-name" name="group-name" required>
+            <br>
+            <button onclick="createGroup()">Создать</button>
+        </div>
+    </div>
+
+    <!-- Таблица со списком студентов выбранной группы -->
+    <div class="container">
+        <h2>Студенты</h2>
+
+        <!-- Кнопка "Добавить студента" -->
+        <a href="#" class="add-student-btn" onclick="toggleStudentForm()">Добавить студента</a>
+        <div id="student-form" class="student-form">
+            <!-- Форма для добавления студента -->
+            <label for="student-name">Имя студента:</label>
+            <input type="text" id="student-name" name="student-name" required>
+            <br>
+            <label for="student-age">Возраст студента:</label>
+            <input type="text" id="student-age" name="student-age" required>
+            <br>
+            <label for="student-group">Группа студента:</label>
+            <input type="text" id="student-group" name="student-group" required>
+            <br>
+            <button onclick="addStudent()">Добавить</button>
+        </div>
+
+        <!-- Выбор группы -->
+        <label for="group-selector">Выберите группу:</label>
+        <select id="group-selector" onchange="filterStudentsByGroup()">
+            <option value="all">Все группы</option>
+            <!-- Добавьте другие группы по мере необходимости -->
+        </select>
+
+        <!-- Таблица -->
+        <table id="student-table">
+            <tr>
+                <th>Имя</th>
+                <th>Возраст</th>
+                <th>Группа</th>
+            </tr>
+            <!-- Начальные строки таблицы будут добавлены здесь -->
+        </table>
+    </div>
+
+    <script>
+        var students = []; // Хранение данных о студентах
+        var groups = [];   // Хранение данных о группах
+
+        function createGroup() {
+            var groupName = document.getElementById('group-name').value;
+
+            if (groupName) {
+                groups.push({ name: groupName });
+                updateGroupList(); // Обновляем список групп после создания
+                clearForm('group-form');
+            } else {
+                alert('Пожалуйста, введите название группы.');
+            }
+        }
+
+        function updateGroupList() {
+            var groupList = document.getElementById('group-list');
+            groupList.innerHTML = '';
+
+            for (var i = 0; i < groups.length; i++) {
+                var listItem = document.createElement('li');
+                listItem.textContent = groups[i].name;
+                listItem.onclick = function() {
+                    setActiveGroup(this.textContent);
+                    filterStudentsByGroup();
+                };
+                groupList.appendChild(listItem);
+            }
+        }
+
+        function setActiveGroup(groupName) {
+            // Убираем класс активной группы у всех элементов
+            var listItems = document.getElementById('group-list').getElementsByTagName('li');
+            for (var i = 0; i < listItems.length; i++) {
+                listItems[i].classList.remove('active-group');
+            }
+
+            // Добавляем класс активной группы выбранному элементу
+            var selectedListItem = Array.from(listItems).find(item => item.textContent === groupName);
+            if (selectedListItem) {
+                selectedListItem.classList.add('active-group');
+            }
+        }
+
+        function addStudent() {
+            var name = document.getElementById('student-name').value;
+            var age = document.getElementById('student-age').value;
+            var group = document.getElementById('student-group').value;
+
+            if (name && age && group) {
+                students.push({ name: name, age: age, group: group });
+                updateStudentTable(); // Обновляем таблицу после добавления студента
+                clearForm('student-form');
+            } else {
+                alert('Пожалуйста, заполните все поля формы.');
+            }
+        }
+
+        function updateStudentTable() {
+            var groupSelector = document.getElementById('group-selector');
+            var selectedGroup = groupSelector.options[groupSelector.selectedIndex].value;
+
+            var table = document.getElementById('student-table');
+            table.innerHTML = '';
+
+            // Создаем заголовок таблицы
+            var headerRow = table.insertRow(0);
+            var headerCell1 = headerRow.insertCell(0);
+            var headerCell2 = headerRow.insertCell(1);
+            var headerCell3 = headerRow.insertCell(2);
+            headerCell1.innerHTML = '<b>Имя</b>';
+            headerCell2.innerHTML = '<b>Возраст</b>';
+            headerCell3.innerHTML = '<b>Группа</b>';
+
+            // Фильтруем студентов по группе
+            var filteredStudents = (selectedGroup === 'all') ? students : students.filter(student => student.group === selectedGroup);
+
+            // Добавляем студентов в таблицу
+            for (var i = 0; i < filteredStudents.length; i++) {
+                var row = table.insertRow(i + 1);
+                var cell1 = row.insertCell(0);
+                var cell2 = row.insertCell(1);
+                var cell3 = row.insertCell(2);
+                cell1.innerHTML = filteredStudents[i].name;
+                cell2.innerHTML = filteredStudents[i].age;
+                cell3.innerHTML = filteredStudents[i].group;
+            }
+        }
+
+        function clearForm(formId) {
+            var form = document.getElementById(formId);
+            var formInputs = form.getElementsByTagName('input');
+            for (var i = 0; i < formInputs.length; i++) {
+                formInputs[i].value = '';
+            }
+        }
+
+        function toggleStudentForm() {
+            var studentForm = document.getElementById('student-form');
+            studentForm.style.display = studentForm.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function toggleGroupForm() {
+            var groupForm = document.getElementById('group-form');
+            groupForm.style.display = groupForm.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function filterStudentsByGroup() {
+            updateStudentTable(); // Обновляем таблицу при изменении выбранной группы
+        }
+    </script>
+</body>
+</html>
+        
+

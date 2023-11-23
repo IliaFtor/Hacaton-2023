@@ -1,0 +1,63 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    display: flex;
+}
+
+.container {
+    flex: 1;
+    margin-right: 20px;
+}
+
+.create-group-btn, .add-student-btn {
+    padding: 10px;
+    background-color: #3498db;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    display: block;
+}
+
+.group-form, .student-form {
+    display: none;
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #3498db;
+    border-radius: 5px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul li {
+    cursor: pointer;
+    margin-bottom: 5px;
+    padding: 8px;
+    background-color: #eee;
+    border-radius: 3px;
+}
+
+ul li:hover {
+    background-color: #ddd;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #3498db;
+    padding: 8px;
+    text-align: left;
+}
+
+.active-group {
+    background-color: #3498db;
+    color: #fff;
+}
