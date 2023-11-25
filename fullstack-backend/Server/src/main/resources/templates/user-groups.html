@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Группы и студенты</title>
+</head>
+<style>
+  .selected {
+    background-color: #3498db;
+  }
+  header {
+    height: 15%;
+    background-color: #3498db;
+    width: 100%;
+  }
+  ul {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: 0;
+    list-style-type: none;
+  }
+  li {
+    background-color: #eee;
+    margin: 2px;
+    padding: 4px;
+    border-radius: 4px;
+  }
+  html {
+     padding: 0;
+  }
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  main {
+    display: flex;
+  }
+  .container {
+    flex: 1;
+    margin: 0 10px;
+    padding: 5px;
+  }
+  .create-group-btn, .add-student-btn {
+    padding: 10px;
+    background-color: #3498db;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .group-form, .student-form {
+    display: none;
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #3498db;
+    border-radius: 5px;
+  }
+  ul li:hover {
+    background-color: #ddd;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+    transition: 0.1s;
+  }
+  th, td {
+    border: 1px solid #3498db;
+    padding: 8px;
+    text-align: left;
+  }
+  .active-group {
+    background-color: #3498db;
+    color: #fff;
+  }
+</style>
+
+<body>
+
+<header th:insert="parts/header :: header"></header>
+
+<main>
+<div class="container">
+  <h2>Группы</h2>
+
+  <a href="#" class="create-group-btn" onclick="toggleGroupForm()">Создать группу</a>
+
+  <div id="group-form" class="group-form" >
+    <form action="/create-group" method="post">
+      <label for="group_name">Название группы:</label>
+
+      <input type="text" id="group_name" name="group_name" required>
+
+      <br>
+
+      <button type="submit">Создать</button>
+    </form>
+
+  </div>
+
+  <table id="group-table">
+    <thead>
+
+    <tr>
+      <th>Имя</th>
+    </tr>
+
+    </thead>
+
+    <tbody>
+
+    <tr th:each="uGroup : ${uGroups}" onclick="selectGroup(this)">
+      <td th:text="${uGroup.getUGroupName()}"></td>
+    </tr>
+
+    </tbody>
+  </table>
+</div>
+
+<div class="container">
+  <h2>Студенты</h2>
+
+  <table id="student-table">
+    <thead>
+
+    <tr>
+      <th>Name</th>
+      <th>Telegram link</th>
+      <th>Role in Group</th>
+    </tr>
+
+    </thead>
+
+    <tbody>
+
+    </tbody>
+  </table>
+</div>
+
+<script>
+  document.getElementById('group-form').style.display = 'none';
+  function toggleGroupForm() {
+    let groupForm = document.getElementById('group-form');
+    groupForm.style.display = (groupForm.style.display === 'none') ? 'block' : 'none';
+  }
+
+  function toggleStudentForm() {
+    let studentForm = document.getElementById('student-form');
+    studentForm.style.display = studentForm.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function selectGroup(row) {
+    // Убираем выделение со всех строк и добавляем на выбранную
+    let table = document.getElementById("group-table");
+    let rows = table.getElementsByTagName("tr");
+
+    for (let i = 0; i < rows.length; i++) {
+      rows[i].classList.remove("selected");
+    }
+    row.classList.add("selected");
+
+    // Получаем имя группы из выбранной строки
+    let groupName = row.cells[0].innerText;
+
+
+
+    getStudentsByGroup(groupName);
+  }
+  function getStudentsByGroup(groupName) {
+    fetch(`/getUsersByUGroupName?group_name=${groupName}`)
+            .then(response => response.json())
+            .then(data => {
+              let studentTable = document.getElementById("student-table").getElementsByTagName('tbody')[0];
+              studentTable.innerHTML = "";
+
+              data.forEach(student => {
+                let row = studentTable.insertRow();
+                let nameCell = row.insertCell(0);
+                let loginCell = row.insertCell(1)
+                let roleCell = row.insertCell(2);
+
+                nameCell.innerText = student.username;
+                roleCell.innerText = student.role.role_name;
+                loginCell.innerText = student.login;// Проверьте соответствие свойств вашим моделям данных
+              });
+            })
+            .catch(error => {
+              console.error('Ошибка:', error);
+            });
+  }
+</script>
+</main>
+
+</body>
+
+</html>

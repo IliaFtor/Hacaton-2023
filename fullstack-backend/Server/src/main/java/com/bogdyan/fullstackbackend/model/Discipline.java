@@ -20,11 +20,11 @@ public class Discipline {
 
     @ManyToMany
     @JoinTable(
-            name="group_didciplines",
+            name="ugroup_didciplines",
             joinColumns = @JoinColumn(name="discipline_id"),
-            inverseJoinColumns = @JoinColumn(name="group_id")
+            inverseJoinColumns = @JoinColumn(name="u_group_id")
     )
-    private Set<UGroup> ugroups = new HashSet<>();
+    private Set<UGroup> uGroups = new HashSet<>();
 
     @OneToMany(mappedBy = "discipline", cascade = CascadeType.ALL)
     private Set<QuestionBank> questionBanks = new HashSet<>();

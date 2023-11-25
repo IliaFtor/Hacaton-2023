@@ -17,11 +17,11 @@ public class UserService {
     }
 
     public List<User> getUsersByUGroupId(Integer group_id) {
-        return userRepository.findAllByugroups_groupId(group_id);
+        return userRepository.findAllByuGroups_uGroupId(group_id);
     }
 
     public List<User> getUsersByUGroupName(String group_name) {
-        return userRepository.findAllByugroups_groupName(group_name);
+        return userRepository.findAllByuGroups_uGroupName(group_name);
     }
 
     public User findById(int id){
@@ -32,6 +32,10 @@ public class UserService {
         User newUser = new User(username, login, password, role);
         userRepository.save(newUser);
         return newUser;
+    }
+
+    public List<User> getAll(){
+        return userRepository.findAll();
     }
 }
 

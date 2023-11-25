@@ -6,7 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface UserRepository  extends JpaRepository<User, Integer> {
-    List<User> findAllByugroups_groupId(Integer group_id);
 
-    List<User> findAllByugroups_groupName(String group_name);
+    List<User> findAllByuGroups_uGroupId(Integer group_id);
+
+    List<User> findAllByuGroups_uGroupName(String group_name);
 }

@@ -1,6 +1,7 @@
 package com.bogdyan.fullstackbackend.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,14 +29,16 @@ public class User {
 
     //Many to many
     @ManyToMany
+    @JsonBackReference
     @JoinTable(
             name="user_groups",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "group_id")
+            inverseJoinColumns = @JoinColumn(name = "u_group_id")
     )
-    private Set<UGroup> ugroups = new HashSet<>();
+    private Set<UGroup> uGroups = new HashSet<>();
 
     @ManyToMany
+    @JsonBackReference
     @JoinTable(
             name="student_test_results",
             joinColumns=@JoinColumn(name="user_id"),

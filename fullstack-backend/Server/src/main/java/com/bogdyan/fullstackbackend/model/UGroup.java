@@ -1,5 +1,6 @@
 package com.bogdyan.fullstackbackend.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,17 +15,19 @@ import java.util.Set;
 public class UGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer groupId;
-    private String groupName;
+    private Integer uGroupId;
+    private String uGroupName;
 
-    @ManyToMany(mappedBy="ugroups")
+    @ManyToMany(mappedBy="uGroups")
+    @JsonBackReference
     private Set<User> users = new HashSet<>();
 
-    @ManyToMany(mappedBy="ugroups")
+    @ManyToMany(mappedBy="uGroups")
+    @JsonBackReference
     private Set<Discipline> disciplines = new HashSet<>();
 
-    public UGroup(String groupName) {
-        this.groupName = groupName;
+    public UGroup(String uGroupName) {
+        this.uGroupName = uGroupName;
     }
     public UGroup() {
     }

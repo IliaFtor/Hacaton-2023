@@ -1,6 +1,7 @@
 package com.bogdyan.fullstackbackend.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +20,7 @@ public class Role {
     private String role_name;
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
+    @JsonBackReference
     private Set<User> users = new HashSet<>();
 
     public Role() {
