@@ -1,19 +1,24 @@
-import qrcode
+import mysql.connector
+def create_database():
+    try:
+        db = mysql.connector.connect(
+            host="127.0.0.1",
+            port=3308,
+            user="root",
+            password="654780Jdm!"
+        )
 
-bot_username = '#@CAABotMyProdject_bot'
-telegram_link = f'https://t.me/{bot_username}'
+        cursor = db.cursor()
 
-qr = qrcode.QRCode(
-    version=1,
-    error_correction=qrcode.constants.ERROR_CORRECT_L,
-    box_size=10,
-    border=4,
-)
-qr.add_data(telegram_link)
-qr.make(fit=True)
+        # Create the hacaton database if it doesn't exist
+        cursor.execute("CREATE DATABASE IF NOT EXISTS hacaton")
 
-img = qr.make_image(fill_color="black", back_color="white")
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
 
-img.save('telegram_bot_qr.png')
+    finally:
+        if db is not None and db.is_connected():
+            db.close()
 
-img.show()
+create_database()
+a = input()            

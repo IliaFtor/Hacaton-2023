@@ -1,5 +1,5 @@
 import mysql.connector
-
+import random
 def setup_database(flag=True):
     db = None
     try:
@@ -8,53 +8,217 @@ def setup_database(flag=True):
             port=3308,
             user="root",
             password="654780Jdm!",
-            database="hacaton"  # Выбирайте базу данных, если она существует
+            database="hacaton"
         )
 
         cursor = db.cursor()
 
-        create_database_query = "CREATE DATABASE IF NOT EXISTS hacaton"
-        cursor.execute(create_database_query)
+        cursor.execute("CREATE DATABASE IF NOT EXISTS hacaton")
+        db.commit()
 
-        cursor.execute("SHOW TABLES LIKE 'Users';")
-        users_table_exists = cursor.fetchone()
+        #cursor.execute("SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0")
+        #cursor.execute("SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0")
+        #cursor.execute("SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'")
+        
+        cursor.execute("USE hacaton")
 
-        if not users_table_exists and flag:
-            flag = False
-            print("Create Data Base...")
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS Discipline (
-                    discipline_id INT PRIMARY KEY,
-                    name VARCHAR(255)
-                    -- Other fields for Discipline
-                );
+        cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS hacaton.Roles (
+                        role_id INT(11) NOT NULL,
+                        role_name VARCHAR(45) NULL DEFAULT NULL,
+                        PRIMARY KEY (role_id)
+                        );
+                        CREATE TABLE IF NOT EXISTS Users (
+                            user_id INT(11) NOT NULL AUTO_INCREMENT,
+                            username VARCHAR(45) NULL DEFAULT NULL,
+                            login VARCHAR(45) NULL DEFAULT NULL,
+                            password VARCHAR(45) NULL DEFAULT NULL,
+                            role_id INT(11) NOT NULL,
+                            PRIMARY KEY (user_id),
+                            UNIQUE INDEX id_UNIQUE (user_id ASC) VISIBLE,
+                            INDEX fk_Users_Roles1_idx (role_id ASC) VISIBLE,
+                            CONSTRAINT fk_Users_Roles1
+                                FOREIGN KEY (role_id)
+                                REFERENCES Roles (role_id)
+                                ON DELETE NO ACTION
+                                ON UPDATE NO ACTION
+                        ) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8;
+                       
+                        CREATE TABLE IF NOT EXISTS UGroups (
+                            u_group_id INT(11) NOT NULL AUTO_INCREMENT,
+                            u_group_name VARCHAR(45) NULL DEFAULT NULL,
+                            PRIMARY KEY (u_group_id),
+                            UNIQUE INDEX idStudentGroups_UNIQUE (u_group_id ASC) VISIBLE)
+                            ENGINE = InnoDB
+                            DEFAULT CHARACTER SET = utf8;
+                            
+                
+                        CREATE TABLE IF NOT EXISTS Disciplines (
+                            discipline_id INT(11) NOT NULL AUTO_INCREMENT,
+                            discipline_name VARCHAR(45) NOT NULL,
+                            PRIMARY KEY (discipline_id),
+                            UNIQUE INDEX idDiscipline_UNIQUE (discipline_id ASC) VISIBLE)
+                            ENGINE = InnoDB
+                            DEFAULT CHARACTER SET = utf8;
+                            
+                
+                        CREATE TABLE IF NOT EXISTS Question_Banks (
+                            question_bank_id INT(11) NOT NULL AUTO_INCREMENT,
+                            question_bank_name VARCHAR(45) NOT NULL,
+                            discipline_id INT(11) NOT NULL,
+                            PRIMARY KEY (question_bank_id),
+                            INDEX fk_QuestionBanks_Discipline1_idx (discipline_id ASC) VISIBLE,
+                            UNIQUE INDEX question_bank_id_UNIQUE (question_bank_id ASC) VISIBLE,
+                            CONSTRAINT fk_QuestionBanks_Discipline1
+                                FOREIGN KEY (discipline_id)
+                                REFERENCES Disciplines (discipline_id)
+                                ON DELETE NO ACTION
+                                ON UPDATE NO ACTION
+                        ) ENGINE = InnoDB DEFAULT CHARACTER SET = utf8;
 
-                CREATE TABLE IF NOT EXISTS StudentGroup (
-                    student_group_id INT PRIMARY KEY,
-                    name VARCHAR(255),
-                    -- Other fields for StudentGroup
+                        CREATE TABLE IF NOT EXISTS User_Groups (
+                            user_group_id INT(11) NOT NULL,
+                            user_id INT(11) NULL DEFAULT NULL,
+                            u_group_id INT(11) NULL DEFAULT NULL,
+                            PRIMARY KEY (user_group_id),
+                            INDEX fk_Users_has_StudentGroups_Users1_idx (user_id ASC) VISIBLE,
+                            INDEX fk_Users_has_StudentGroups_StudentGroups1_idx (u_group_id ASC) VISIBLE,
+                            UNIQUE INDEX user_group_id_UNIQUE (user_group_id ASC) VISIBLE,
+                            CONSTRAINT fk_Users_has_StudentGroups_Users1
+                                FOREIGN KEY (user_id)
+                                REFERENCES Users (user_id)
+                                ON DELETE NO ACTION
+                                ON UPDATE NO ACTION,
+                            CONSTRAINT fk_Users_has_StudentGroups_StudentGroups1
+                                FOREIGN KEY (u_group_id)
+                                REFERENCES UGroups (u_group_id)
+                                ON DELETE NO ACTION
+                                ON UPDATE NO ACTION)
+                            ENGINE = InnoDB
+                            DEFAULT CHARACTER SET = utf8;
 
-                    -- Foreign key references
-                    discipline_id INT,
-                    FOREIGN KEY (discipline_id) REFERENCES Discipline(discipline_id)
-                );
+                        CREATE TABLE IF NOT EXISTS Disciplines (
+                            discipline_id INT(11) NOT NULL AUTO_INCREMENT,
+                            discipline_name VARCHAR(45) NOT NULL,
+                            PRIMARY KEY (discipline_id),
+                            UNIQUE INDEX idDiscipline_UNIQUE (discipline_id ASC) VISIBLE)
+                            ENGINE = InnoDB
+                            DEFAULT CHARACTER SET = utf8;
 
-                CREATE TABLE IF NOT EXISTS Users (
-                    user_id INT PRIMARY KEY,
-                    username VARCHAR(255),
-                    login VARCHAR(255),
-                    role INT,
-                    id INT,
-                    -- Other fields for Users
+                        CREATE TABLE IF NOT EXISTS UGroup_Didciplines (
+                            u_group_discipline_id INT(11) NOT NULL,
+                            discipline_id INT(11) NOT NULL,
+                            u_group_id INT(11) NOT NULL,
+                            PRIMARY KEY (u_group_discipline_id),
+                            INDEX fk_Discipline_has_StudentGroups_StudentGroups1_idx (u_group_id ASC) VISIBLE,
+                            INDEX fk_Discipline_has_StudentGroups_Discipline1_idx (discipline_id ASC) VISIBLE,
+                            UNIQUE INDEX group_discipline_id_UNIQUE (u_group_discipline_id ASC) VISIBLE,
+                            CONSTRAINT fk_Discipline_has_StudentGroups_Discipline1
+                                FOREIGN KEY (discipline_id)
+                                REFERENCES Disciplines (discipline_id)
+                                ON DELETE NO ACTION
+                                ON UPDATE NO ACTION,
+                            CONSTRAINT fk_Discipline_has_StudentGroups_StudentGroups1
+                                FOREIGN KEY (u_group_id)
+                                REFERENCES UGroups (u_group_id)
+                                ON DELETE NO ACTION
+                                ON UPDATE NO ACTION)
+                            ENGINE = InnoDB
+                            DEFAULT CHARACTER SET = utf8;
 
-                    -- Foreign key references
-                    student_group_id INT,
-                    FOREIGN KEY (student_group_id) REFERENCES StudentGroup(student_group_id)
-                );
-            ''')
-            db.commit()
+                            CREATE TABLE IF NOT EXISTS Question_Groups (
+                                question_group_id INT(11) NOT NULL AUTO_INCREMENT,
+                                question_group_name VARCHAR(45) NOT NULL,
+                                question_bank_id INT(11) NOT NULL,
+                                PRIMARY KEY (question_group_id),
+                                INDEX fk_QuestionGroups_QuestionBanks1_idx (question_bank_id ASC) VISIBLE,
+                                UNIQUE INDEX question_group_id_UNIQUE (question_group_id ASC) VISIBLE,
+                                CONSTRAINT fk_QuestionGroups_QuestionBanks1
+                                    FOREIGN KEY (question_bank_id)
+                                    REFERENCES Question_Banks (question_bank_id)
+                                    ON DELETE NO ACTION
+                                    ON UPDATE NO ACTION)
+                                ENGINE = InnoDB
+                                DEFAULT CHARACTER SET = utf8;
 
-            print("The database has been created or is ready for use")
+                                CREATE TABLE IF NOT EXISTS Tests (
+                                    test_id INT(11) NOT NULL AUTO_INCREMENT,
+                                    test_name VARCHAR(45) NOT NULL,
+                                    question_group_id INT(11) NOT NULL,
+                                    PRIMARY KEY (test_id),
+                                    UNIQUE INDEX test_id_UNIQUE (test_id ASC) VISIBLE,
+                                    INDEX fk_Tests_Question_Groups1_idx (question_group_id ASC) VISIBLE,
+                                    CONSTRAINT fk_Tests_Question_Groups1
+                                        FOREIGN KEY (question_group_id)
+                                        REFERENCES Question_Groups (question_group_id)
+                                        ON DELETE NO ACTION
+                                        ON UPDATE NO ACTION)
+                                    ENGINE = InnoDB
+                                    DEFAULT CHARACTER SET = utf8;
+
+                                CREATE TABLE IF NOT EXISTS Student_Test_Results (
+                                    result_id INT(11) NOT NULL AUTO_INCREMENT,
+                                    user_id INT(11) NULL DEFAULT NULL,
+                                    test_id INT(11) NULL DEFAULT NULL,
+                                    score_all FLOAT(11) NULL DEFAULT NULL,
+                                    timelimit_in_seconds INT(11) NULL DEFAULT NULL,
+                                    PRIMARY KEY (result_id),
+                                    INDEX fk_Users_has_Tests_Tests1_idx (test_id ASC) VISIBLE,
+                                    INDEX fk_Users_has_Tests_Users1_idx (user_id ASC) VISIBLE,
+                                    UNIQUE INDEX result_id_UNIQUE (result_id ASC) VISIBLE,
+                                    CONSTRAINT fk_Users_has_Tests_Users1
+                                        FOREIGN KEY (user_id)
+                                        REFERENCES Users (user_id)
+                                        ON DELETE NO ACTION
+                                        ON UPDATE NO ACTION,
+                                    CONSTRAINT fk_Users_has_Tests_Tests1
+                                        FOREIGN KEY (test_id)
+                                        REFERENCES Tests (test_id)
+                                        ON DELETE NO ACTION
+                                        ON UPDATE NO ACTION)
+                                    ENGINE = InnoDB
+                                    DEFAULT CHARACTER SET = utf8;
+
+                                CREATE TABLE IF NOT EXISTS Questions (
+                                    question_id INT(11) NOT NULL AUTO_INCREMENT,
+                                    question_text VARCHAR(45) NOT NULL,
+                                    question_group_id INT(11) NOT NULL,
+                                    PRIMARY KEY (question_id),
+                                    UNIQUE INDEX question_id_UNIQUE (question_id ASC) VISIBLE,
+                                    INDEX fk_Questions_Question_Groups1_idx (question_group_id ASC) VISIBLE,
+                                    CONSTRAINT fk_Questions_Question_Groups1
+                                        FOREIGN KEY (question_group_id)
+                                        REFERENCES Question_Groups (question_group_id)
+                                        ON DELETE NO ACTION
+                                        ON UPDATE NO ACTION)
+                                    ENGINE = InnoDB
+                                    DEFAULT CHARACTER SET = utf8;
+
+                                CREATE TABLE IF NOT EXISTS Answers (
+                                    answer_id INT(11) NOT NULL AUTO_INCREMENT,
+                                    question_id INT(11) NOT NULL,
+                                    is_correct TINYINT(4) NULL DEFAULT NULL,
+                                    answer_score FLOAT(11) NOT NULL,
+                                    PRIMARY KEY (answer_id),
+                                    INDEX fk_Answers_Questions1_idx (question_id ASC) VISIBLE,
+                                    UNIQUE INDEX answer_id_UNIQUE (answer_id ASC) VISIBLE,
+                                    CONSTRAINT fk_Answers_Questions1
+                                        FOREIGN KEY (question_id)
+                                        REFERENCES Questions (question_id)
+                                        ON DELETE NO ACTION
+                                        ON UPDATE NO ACTION)
+                                    ENGINE = InnoDB
+                                    DEFAULT CHARACTER SET = utf8;
+
+                                CREATE TABLE IF NOT EXISTS Roles (
+                                    role_id INT(11) NOT NULL,
+                                    role_name VARCHAR(45) NULL DEFAULT NULL,
+                                    PRIMARY KEY (role_id))
+                                    ENGINE = InnoDB
+                                    DEFAULT CHARACTER SET = utf8;
+                ''',multi=True)
+        db.commit()
+        print("The database has been created or is ready for use")
 
     except mysql.connector.Error as err:
         print(f"Error: {err}")
@@ -62,8 +226,12 @@ def setup_database(flag=True):
     finally:
         if db is not None and db.is_connected():
             db.close()
-
-def insert_user(user_id, name, soName, group):
+###################################################################
+def check_user_registration(user_id):
+    user_data = get_user_data(user_id)
+    return user_data is not None
+###################################################################
+def insert_user(user_id, username, student_group_id):
     try:
         db = mysql.connector.connect(
             host="127.0.0.1",
@@ -73,8 +241,9 @@ def insert_user(user_id, name, soName, group):
             database="hacaton"
         )
         cursor = db.cursor()
-        cursor.execute("INSERT INTO Users (user_id, username, login, role, id, student_group_id) VALUES (%s, %s, %s, %s, %s, %s)",
-                       (user_id, name, soName, group, None, None))
+        query = "INSERT INTO users(user_id,username, login,password,role_id) VALUES (%s, %s, %s, %s, %s)"
+        values = (user_id,username, student_group_id,None,1)
+        cursor.execute(query, values)
         db.commit()
 
     except Exception as e:
@@ -83,7 +252,37 @@ def insert_user(user_id, name, soName, group):
     finally:
         if db is not None and db.is_connected():
             db.close()
+#####################################################################
+def testing(id_test):
+    try:
+        with mysql.connector.connect(
+            host="127.0.0.1",
+            port=3308,
+            user="root",
+            password="654780Jdm!",
+            database="hacaton"
+        ) as db:
+            cursor = db.cursor()
+            cursor.execute("SELECT id FROM Questions")
+            all_question_ids = [row[0] for row in cursor.fetchall()]
 
+            random.shuffle(all_question_ids)
+            questions_list = []
+            for question_id in all_question_ids[:2]:
+                cursor.execute("SELECT * FROM Questions WHERE question_id=%s AND question_group_id=%s", (question_id, id_test))
+                question_data = cursor.fetchone()
+
+                if question_data:
+                    questions_list.append({
+                        question_data[0],
+                        question_data[1],
+                    })
+
+            return questions_list
+    except Exception as e:
+        print(f"Error: {e}")
+
+###############################################################
 def get_user_data(user_id):
     try:
         with mysql.connector.connect(
@@ -101,10 +300,9 @@ def get_user_data(user_id):
                 return {
                     'user_id': user_data[0],
                     'username': user_data[1],
-                    'login': user_data[2],
-                    'role': user_data[3],
-                    'id': user_data[4],
-                    'student_group_id': user_data[5],
+                    'login': user_data[2],         
+                    'password': user_data[3],
+                    'role': user_data[4],
                 }
             else:
                 return None
