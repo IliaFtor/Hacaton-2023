@@ -1,6 +1,7 @@
 import mysql.connector
 import random
-def setup_database(flag=True):
+
+def connect ():
     db = None
     try:
         db = mysql.connector.connect(
@@ -10,7 +11,12 @@ def setup_database(flag=True):
             password="654780Jdm!",
             database="hacaton"
         )
-
+        return db
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+def setup_database(flag=True):
+    db = connect()
+    try:
         cursor = db.cursor()
 
         cursor.execute("CREATE DATABASE IF NOT EXISTS hacaton")
@@ -217,6 +223,7 @@ def setup_database(flag=True):
                                     ENGINE = InnoDB
                                     DEFAULT CHARACTER SET = utf8;
                 ''',multi=True)
+        
         db.commit()
         print("The database has been created or is ready for use")
 
@@ -226,87 +233,3 @@ def setup_database(flag=True):
     finally:
         if db is not None and db.is_connected():
             db.close()
-###################################################################
-def check_user_registration(user_id):
-    user_data = get_user_data(user_id)
-    return user_data is not None
-###################################################################
-def insert_user(user_id, username, student_group_id):
-    try:
-        db = mysql.connector.connect(
-            host="127.0.0.1",
-            port=3308,
-            user="root",
-            password="654780Jdm!",
-            database="hacaton"
-        )
-        cursor = db.cursor()
-        query = "INSERT INTO users(user_id,username, login,password,role_id) VALUES (%s, %s, %s, %s, %s)"
-        values = (user_id,username, student_group_id,None,1)
-        cursor.execute(query, values)
-        db.commit()
-
-    except Exception as e:
-        print(f"Error while executing the query: {e}")
-
-    finally:
-        if db is not None and db.is_connected():
-            db.close()
-#####################################################################
-def testing(id_test):
-    try:
-        with mysql.connector.connect(
-            host="127.0.0.1",
-            port=3308,
-            user="root",
-            password="654780Jdm!",
-            database="hacaton"
-        ) as db:
-            cursor = db.cursor()
-            cursor.execute("SELECT id FROM Questions")
-            all_question_ids = [row[0] for row in cursor.fetchall()]
-
-            random.shuffle(all_question_ids)
-            questions_list = []
-            for question_id in all_question_ids[:2]:
-                cursor.execute("SELECT * FROM Questions WHERE question_id=%s AND question_group_id=%s", (question_id, id_test))
-                question_data = cursor.fetchone()
-
-                if question_data:
-                    questions_list.append({
-                        question_data[0],
-                        question_data[1],
-                    })
-
-            return questions_list
-    except Exception as e:
-        print(f"Error: {e}")
-
-###############################################################
-def get_user_data(user_id):
-    try:
-        with mysql.connector.connect(
-            host="127.0.0.1",
-            port=3308,
-            user="root",
-            password="654780Jdm!",
-            database="hacaton"
-        ) as db:
-            cursor = db.cursor()
-            cursor.execute("SELECT * FROM users WHERE user_id=%s", (user_id,))
-            user_data = cursor.fetchone()
-
-            if user_data:
-                return {
-                    'user_id': user_data[0],
-                    'username': user_data[1],
-                    'login': user_data[2],         
-                    'password': user_data[3],
-                    'role': user_data[4],
-                }
-            else:
-                return None
-
-    except mysql.connector.Error as err:
-        print(f"Error while executing the query: {err}")
-        return None
