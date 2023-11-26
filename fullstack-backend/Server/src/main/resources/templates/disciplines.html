@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Список дисциплин</title>
+  <style>
+    /* CSS стили */
+
+    ul li:hover {
+      background-color: #ddd;
+    }
+    html {
+      padding: 0;
+      height: 100%;
+    }
+    body {
+      background-color: #cccccc;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+    }
+    header {
+      height: 80px;
+      background-color: #3498db;
+      width: 100%;
+    }
+    ul {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      margin: 0;
+      list-style-type: none;
+    }
+    li {
+      background-color: #eee;
+      margin: 2px;
+      padding: 4px;
+      border-radius: 4px;
+    }
+    .container {
+      width: 80%;
+      margin-top: 20px;
+      display: flex;
+      background-color: #fff;
+      border-radius: 5px;
+      height: 100%;
+      flex-direction: column;
+      align-items: center;
+    }
+    .add-discipline {
+      margin-bottom: 20px;
+    }
+    .disciplines {
+      width: 90%;
+      padding: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .discipline {
+      padding: 5px;
+      width: 30%;
+      border: #cccccc solid 2px;
+      background-color: #dddddd;
+      border-radius: 5px;
+      margin: 2px;
+    }
+  </style>
+</head>
+<body>
+<header>
+  <ul th:include="parts/header :: header">
+
+  </ul>
+</header>
+
+<div class="container">
+  <h1>Список дисциплин</h1>
+
+  <form class="add-discipline" method="post" action="/disciplines/add">
+    <input type="text" name="text" placeholder="Введите название дисциплины" required>
+    <button type="submit">Добавить дисциплину</button>
+  </form>
+
+  <div class="disciplines">
+    <div class="discipline" th:each="discipline : ${disciplines}">
+      <h3 th:text="${discipline.getDisciplineName()}"></h3>
+      <p>Num of connected groups: <span th:text="${discipline.getUGroups().size()}"></span></p>
+      <p>Num of question banks: <span th:text="${discipline.getQuestionBanks().size()}"></span></p>
+      <a th:href="@{/disciplines/__${discipline.getDisciplineName()}__}"><p>more... </p></a>
+    </div>
+  </div>
+
+
+  </div>
+
+  <!-- Кнопка для добавления новой дисциплины -->
+
+</div>
+
+</body>
+</html>

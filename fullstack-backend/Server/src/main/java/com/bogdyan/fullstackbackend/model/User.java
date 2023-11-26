@@ -18,9 +18,15 @@ public class User {
 
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Integer user_id;
+    private Integer userId;
+
+    @Column(length = 45)
     private  String username;
+
+    @Column(length = 45)
     private String login;
+
+    @Column(length = 45)
     private String password;
 
     @ManyToOne

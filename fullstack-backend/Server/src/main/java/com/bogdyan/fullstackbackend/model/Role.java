@@ -16,8 +16,10 @@ import java.util.Set;
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int role_id;
-    private String role_name;
+    private int roleId;
+
+    @Column(length = 45)
+    private String roleName;
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
     @JsonBackReference
@@ -26,6 +28,6 @@ public class Role {
     public Role() {
     }
     public Role(String role_name) {
-        this.role_name = role_name;
+        this.roleName = roleName;
     }
 }

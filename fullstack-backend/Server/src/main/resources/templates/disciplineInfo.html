@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Информация о дисциплине</title>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff; /* Белый цвет фона для страницы */
+            color: #333333; /* Цвет текста */
+            margin: 0;
+            padding: 20px;
+            height: 100vh; /* Высота страницы */
+        }
+
+        h1 {
+            color: #3498db; /* Синий цвет для заголовка */
+        }
+
+        .discipline-info {
+            background-color: #f2f2f2; /* Светло-серый цвет фона блока с информацией */
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Тень блока */
+            max-width: 600px; /* Максимальная ширина блока */
+            width: 100%; /* Ширина блока на всю доступную ширину */
+        }
+
+        .discipline-info p {
+            margin-bottom: 10px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            list-style-type: disc;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+
+<body>
+<h1>Информация о дисциплине</h1>
+<div class="discipline-info" th:if="${discipline}">
+    <h2>Название дисциплины: <span th:text="${discipline.disciplineName}"></span></h2>
+    <h2>Список групп:</h2>
+    <ul>
+        <li th:each="group : ${discipline.getUGroups()}" th:text="${group.getUGroupName()}"><a  th:href="@{/groups/__${group.getUGroupName()}__}"></a > more...</a></li>
+    </ul>
+
+    <h2>Вопросы по дисциплине:</h2>
+    <ul>
+        <h3>QuestionBanks</h3>
+        <li th:each="questionBank : ${discipline.getQuestionBanks()}">
+            <h4 th:text="${questionBank.getQuestionBankName()}"></h4>
+            <h4>Questions</h4>
+            <ul>
+                <li th:each="question : ${questionBank.getQuestions()}">
+                    <a th:href="@{/question/__${question.getQuestionId()}__}"><h4 th:text="${question.getQuestionText()}"></h4></a>
+                    <h4>Number of answers: <span th:text="${question.getAnswers().size()}"></span></h4>
+                </li>
+            </ul>>
+        </li>
+    </ul>
+</div>
+<div th:unless="${discipline}">
+    <p>Дисциплина не найдена.</p>
+</div>
+</body>
+</html>

@@ -16,20 +16,31 @@ import java.util.Set;
 public class QuestionGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer question_group_id;
-    private String question_group_name;
+    private Integer questionGroupId;
+
+    @Column(length = 45)
+    private String questionGroupName;
 
     @ManyToOne
     @JoinColumn(name="question_bank_id")
     private QuestionBank questionBank;
 
     @OneToMany(mappedBy = "questionGroup", cascade = CascadeType.ALL)
-    private Set<Test> test = new HashSet<>();
+    private Set<Test> tests = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name="question_group_questions",
+            joinColumns = @JoinColumn(name = "question_group_id"),
+            inverseJoinColumns = @JoinColumn(name = "question_id")
+    )
+    private Set<Question> questions = new HashSet<>();
 
     public QuestionGroup() {
     }
-    public QuestionGroup(String question_group_name, QuestionBank questionBank) {
-        this.question_group_name = question_group_name;
+
+    public QuestionGroup(String questionGroupName, QuestionBank questionBank) {
+        this.questionGroupName = questionGroupName;
         this.questionBank = questionBank;
     }
 }

@@ -11,7 +11,7 @@
     background-color: #3498db;
   }
   header {
-    height: 15%;
+    height: 80px;
     background-color: #3498db;
     width: 100%;
   }
@@ -84,7 +84,11 @@
 
 <body>
 
-<header th:insert="parts/header :: header"></header>
+<header >
+  <ul th:include="parts/header :: header">
+
+  </ul>
+</header>
 
 <main>
 <div class="container">

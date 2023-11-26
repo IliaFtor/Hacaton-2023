@@ -1,6 +1,7 @@
 package com.bogdyan.fullstackbackend.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,12 +17,18 @@ import java.util.Set;
 public class QuestionBank {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer question_bank_id;
-    private String question_bank_name;
+    private Integer questionBankId;
+
+    @Column(length = 45)
+    private String questionBankName;
 
     @ManyToOne
     @JoinColumn(name="discipline_id")
     private Discipline discipline;
+
+
+    @OneToMany(mappedBy = "questionBank", cascade = CascadeType.ALL)
+    private Set<Question> questions = new HashSet<>();
 
     @OneToMany(mappedBy = "questionBank", cascade = CascadeType.ALL)
     private Set<QuestionGroup> questionGroups = new HashSet<>();
@@ -29,7 +36,7 @@ public class QuestionBank {
     public QuestionBank() {
     }
     public QuestionBank(String question_bank_name, Discipline discipline) {
-        this.question_bank_name = question_bank_name;
+        this.questionBankName = question_bank_name;
         this.discipline = discipline;
     }
 }

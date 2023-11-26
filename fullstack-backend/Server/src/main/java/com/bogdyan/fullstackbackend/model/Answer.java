@@ -12,9 +12,12 @@ import lombok.Setter;
 public class Answer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer answer_id;
-    private Byte is_correct;
-    private Integer answer_score;
+    private Integer answerId;
+    private Byte isCorrect;
+    private Integer answerScore;
+
+    @Column(length = 45)
+    private String content;
 
     @ManyToOne
     @JoinColumn(name="question_id")
@@ -22,10 +25,11 @@ public class Answer {
 
     public Answer() {
     }
-    public Answer(Byte is_correct, Integer answer_score, Question question) {
-        this.is_correct = is_correct;
-        this.answer_score = answer_score;
+    public Answer(Byte isCorrect, Integer answerScore, Question question, String content) {
+        this.isCorrect = isCorrect;
+        this.answerScore = answerScore;
         this.question = question;
+        this.content = content;
     }
 
 }

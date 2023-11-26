@@ -15,8 +15,10 @@ import java.util.Set;
 public class Discipline {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer discipline_id;
-    private String discipline_name;
+    private Integer disciplineId;
+
+    @Column(length = 45)
+    private String disciplineName;
 
     @ManyToMany
     @JoinTable(
@@ -30,5 +32,8 @@ public class Discipline {
     private Set<QuestionBank> questionBanks = new HashSet<>();
 
     public Discipline() {
+    }
+    public Discipline(String name){
+        this.disciplineName = name;
     }
 }

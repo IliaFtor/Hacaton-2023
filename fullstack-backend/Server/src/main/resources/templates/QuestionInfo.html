@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Информация о дисциплине</title>
+  <meta charset="utf-8">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #ffffff; /* Белый цвет фона для страницы */
+      color: #333333; /* Цвет текста */
+      margin: 0;
+      padding: 20px;
+      height: 100vh; /* Высота страницы */
+    }
+
+    h1 {
+      color: #3498db; /* Синий цвет для заголовка */
+    }
+
+    .question-info {
+      background-color: #f2f2f2; /* Светло-серый цвет фона блока с информацией */
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Тень блока */
+      max-width: 800px; /* Максимальная ширина блока */
+      width: 100%; /* Ширина блока на всю доступную ширину */
+    }
+
+    .discipline-info p {
+      margin-bottom: 10px;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    li {
+      list-style-type: disc;
+      margin-left: 5px;
+    }
+    .inline {
+      display: inline-block;
+    }
+  </style>
+</head>
+
+<body>
+<h1>Информация о Вопросе</h1>
+<div class="question-info" th:if="${question}">
+  <h2>Описание: <span th:text="${question.getQuestionText()}"></span></h2>
+  <h2>In Groups:</h2>
+  <ul>
+    <li th:each="group : ${question.getQuestionGroups()}" th:text="${group.getQuestionGroupName()}"></li>
+  </ul>
+
+  <h2>Ответы:</h2>
+  <ul>
+    <li th:each="answer : ${question.getAnswers()}">
+      <form th:action="@{'/' + ${question.getQuestionId()} + '/change-answer/' + ${answer.getAnswerId()}}" method="post">
+        <div class="inline"><span th:text="${answer.getContent()}">  </span><input name="text" type="text" placeholder="Change"><input type="submit" content="Save"></L></div>
+
+      </form>
+      <br>
+    </li>
+  </ul>
+</div>
+<div th:unless="${question}">
+  <p>Дисциплина не найдена.</p>
+</div>
+</body>
+</html>

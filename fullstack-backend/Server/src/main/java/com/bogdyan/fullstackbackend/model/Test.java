@@ -14,8 +14,10 @@ import java.util.Set;
 public class Test {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer test_id;
-    private String test_name;
+    private Integer testId;
+
+    @Column(length = 45)
+    private String testName;
 
     @ManyToMany(mappedBy = "tests")
     private Set<User> users = new HashSet<>();
@@ -24,8 +26,16 @@ public class Test {
     @JoinColumn(name="question_group_id")
     private QuestionGroup questionGroup;
 
-    public Test(String test_name, QuestionGroup questionGroup) {
-        this.test_name = test_name;
+    @ManyToMany
+    @JoinTable(
+            name="test_questions",
+            joinColumns=@JoinColumn(name="test_id"),
+            inverseJoinColumns = @JoinColumn(name="question_id")
+    )
+    private Set<Question> questions = new HashSet<>();
+
+    public Test(String testName, QuestionGroup questionGroup) {
+        this.testName = testName;
         this.questionGroup = questionGroup;
     }
     public Test() {

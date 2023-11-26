@@ -16,6 +16,8 @@ public class UGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer uGroupId;
+
+    @Column(length = 45)
     private String uGroupName;
 
     @ManyToMany(mappedBy="uGroups")
