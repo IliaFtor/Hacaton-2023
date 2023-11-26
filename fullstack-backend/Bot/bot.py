@@ -1,4 +1,4 @@
-import sqlite3
+import SQL_query
 import SQLset
 import asyncio
 import logging
@@ -8,7 +8,6 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.utils import executor
 from aiogram.dispatcher import FSMContext
-from SQLset import insert_user, get_user_data
 
 logging.basicConfig(level=logging.INFO)
 logging.basicConfig(level=logging.INFO)
@@ -21,50 +20,67 @@ dp.middleware.setup(LoggingMiddleware())
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 dp.middleware.setup(LoggingMiddleware())
-
+#################################################################################
 async def on_startup(dp):
     print("Бот был запущен")
     await CreateDataBase()
-
 async def CreateDataBase():
     try:
         SQLset.setup_database()
     except Exception as e:
         print(f"Ошибка при выполнении скрипта: {e}")
-
 async def on_shutdown(dp):
     print()
-
+################################################################################
 @dp.message_handler(commands=['start', 'help'])
 async def send_welcome(message: types.Message):
-    await message.reply("Привет, это бот для регистрации пользователей. Используйте /registration для регистрации.")
+    await message.reply("Привет, это бот используеться для тестирования.\n-Используйте /registration для регистрации.\n-Или вы можите начать тестирования /test")
 
+################################################################################
+@dp.message_handler(commands=['start_test', 'test'])
+async def start_testing(message: types.Message):
+    if SQL_query.check_user_registration(message.from_user.id):
+        await message.answer("Тест начинается...")
+        try:
+            await Testing(SQL_query.testing(), message)
+        except Exception as e:
+            print(f"Error: {e}")
+    else:
+        await message.answer("Извините, вы не зарегистрированы.\nДля начала тестирования вы должны авторизоваться командой /registration")
+
+async def Testing(id_test, message: types.Message):
+    test_dict = SQL_query.testing(id_test)
+
+    for question_text, correct_answer in test_dict.items():
+        await message.answer(f"{question_text}")
+
+        response = await dp.bot.send_message(message.chat.id, "Ваш ответ:")
+
+        await SQL_query.process_response(response, correct_answer)
+
+        
+   
 ###########################################################################################
 
 class RegistrationStates(StatesGroup):
-    Name = State()
-    SoName = State()
+    FullName = State()
     Group = State()
 
-@dp.message_handler(commands=['registration'])
-async def registration_start(message: types.Message):
-    await message.answer("Введите ваше имя:")
-    await RegistrationStates.Name.set()    
+@dp.message_handler(commands=('registration'))
+async def registration_start(message: types.Message, state: FSMContext):
+    if SQL_query.check_user_registration(message.from_user.id):
+        await message.answer("Вы уже зарегистрированы.")
+        return
 
-@dp.message_handler(state=RegistrationStates.Name)
-async def process_name(message: types.Message, state: FSMContext):
-    name = message.text
-    await state.update_data(name=name)
+    await message.answer("Введите ваше ФИО:")
+    await RegistrationStates.FullName.set()
 
-    await message.answer("Введите вашу фамилию:")
-    await RegistrationStates.SoName.set()
+@dp.message_handler(state=RegistrationStates.FullName)
+async def process_full_name(message: types.Message, state: FSMContext):
+    full_name = message.text
+    await state.update_data(full_name=full_name)
 
-@dp.message_handler(state=RegistrationStates.SoName)
-async def process_soName(message: types.Message, state: FSMContext):
-    soName = message.text
-    await state.update_data(soName=soName)
-
-    await message.answer("Введите номер вашей группы:")
+    await message.answer("Введите вашу группу")
     await RegistrationStates.Group.set()
 
 @dp.message_handler(state=RegistrationStates.Group)
@@ -72,11 +88,15 @@ async def process_group(message: types.Message, state: FSMContext):
     group = message.text
     await state.update_data(group=group)
 
+    await save(message, state)
+
+async def save(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
     user_id = message.from_user.id
 
-    insert_user(user_id, user_data['name'], user_data['soName'], user_data['group'])
-    await message.answer("Регистрация завершена. Спасибо!")
+    ansewer=SQL_query.insert_user(user_id, user_data['full_name'], user_data['group'])
+
+    await message.answer(ansewer)
     await state.finish()
 
 
@@ -84,15 +104,14 @@ async def process_group(message: types.Message, state: FSMContext):
 @dp.message_handler(commands=['status'])
 async def status(message: types.Message):
     user_id = message.from_user.id
-    user_data = SQLset.get_user_data(user_id)
+    user_data = SQL_query.get_user_data(user_id)
 
     if user_data:
-        status_text = f"Статус пользователя {user_data['username']} {user_data['login']}: {user_data['role']}"
+        status_text = f"Статус пользователя {user_data['username']} {user_data['group_name']}" 
     else:
         status_text = "Пользователь не найден."
 
     await message.answer(status_text)
-
 #########################################################################################
 
 
