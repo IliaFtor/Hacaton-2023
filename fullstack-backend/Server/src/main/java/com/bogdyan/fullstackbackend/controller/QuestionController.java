@@ -29,11 +29,21 @@ public class QuestionController {
     }
 
     @PostMapping("/{id}/change-answer/{answer-id}")
-    public String changeQuestionAnswer(@PathVariable("id") int id, @PathVariable("answer-id") int aid, String text, Model model){
-        Answer answer = answerService.findById(aid);
-        answer.setContent(text);
-        answerService.save(answer);
+    public String changeQuestionAnswer(@PathVariable("id") int id, @PathVariable("answer-id") int aid, String text, String score, Model model){
+        answerService.changeAnswer(aid, text, score);
         model.addAttribute("question", questionService.findById(id));
+        return "QuestionInfo";
+    }
+
+    @PostMapping("/{id}/add-answer")
+    public String addAnswer(@PathVariable("id") String id, String name, int score, Model model){
+        return "QuestionInfo";
+    }
+
+    @PostMapping("/{qid}/delete-answer/{aid}")
+    public String deleteAnswer(@PathVariable("qid") int qid, @PathVariable("aid") int aid, Model model) {
+        answerService.deleteAnswer(aid);
+        model.addAttribute("question", questionService.findById(qid));
         return "QuestionInfo";
     }
 }

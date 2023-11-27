@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Информация о дисциплине</title>
+    <meta charset="utf-8">
+    <style>
+        .header {
+            height: 80px;
+            background-color: #3498db;
+            width: 100%;
+        }
+        .header ul {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            margin: 0;
+            list-style-type: none;
+        }
+        .header ul li {
+            background-color: #eee;
+            margin: 2px;
+            padding: 4px;
+            border-radius: 4px;
+        }
+        .header ul li:hover {
+            background-color: #ddd;
+        }
+        main {
+            padding: 20px;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff; /* Белый цвет фона для страницы */
+            color: #333333; /* Цвет текста */
+            margin: 0;
+            height: 100vh; /* Высота страницы */
+        }
+
+        h1 {
+            color: #3498db; /* Синий цвет для заголовка */
+        }
+
+        .question-info {
+            background-color: #f2f2f2; /* Светло-серый цвет фона блока с информацией */
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Тень блока */
+            max-width: 800px; /* Максимальная ширина блока */
+            width: 100%; /* Ширина блока на всю доступную ширину */
+        }
+
+        .discipline-info p {
+            margin-bottom: 10px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            list-style-type: disc;
+            margin-left: 5px;
+        }
+        .inline {
+            display: inline-block;
+        }
+        form {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #fcfcfc;
+        }
+
+        tbody tr:hover {
+            background-color: #f2f2f2;
+        }
+
+        input[type="text"] {
+            width: 80px;
+            padding: 5px;
+            margin-right: 5px;
+        }
+
+        button[type="submit"] {
+            padding: 5px 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .add-form {
+            margin-bottom: 20px;
+        }
+
+        .add-form input[type="text"] {
+            width: 150px;
+            padding: 8px;
+            margin-right: 10px;
+        }
+
+        .add-form button[type="submit"] {
+            padding: 8px 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<header th:insert="parts/header :: header"></header>
+<main>
+    <h1>Test info</h1>
+    <div class="question-info" th:if="${test}">
+        <h2>Name: <span th:text="${test.getTestName()}"></span></h2>
+        <div class="inline">
+            <h2>In Group:<span th:text="${test.getQuestionGroup().getQuestionGroupName()}"></span></h2>
+        <form th:action="@{'/' + ${test.getTestId()} + '/change-question-group'}" method="post">
+            <select  name="group">
+                <option th:each="group : ${groups}" th:value="${group.getQuestionGroupId()}"><span th:text="${group.getQuestionGroupName()}"></span></option>
+            </select>
+            <input type="submit" content="Save">
+        </form>
+        </div>
+
+        <h2>Questions:</h2>
+        <ul>
+            <li >
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Question</th>
+                        <th>Num of Answers</th>
+                        <th>Delete</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="question : ${test.getQuestions()}">
+                        <td>
+                            <span th:text="${question.getQuestionText()}"></span>
+                        </td>
+                        <td>
+                            <span th:text="${question.getAnswers().size()}"></span>
+                        </td>
+                        <td>
+                            <form th:action="@{'/test/' + ${test.getTestId()} +'/delete-question/' + ${question.getQuestionId()}}"  method="post">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </li>
+        </ul>
+        <h2>Add new question:</h2>
+        <form class="add-form"  method="post">
+            <input  name="content" type="text" placeholder="Содержание" required>
+            <input  name="score" type="number" placeholder="Оценка" required>
+            <button class="add-sub" type="submit">Добавить</button>
+        </form>
+    </div>
+    <div th:unless="${test}">
+        <p>Test not found.</p>
+    </div>
+</main>
+</body>
+</html>

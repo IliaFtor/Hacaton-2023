@@ -24,6 +24,9 @@ public class UGroup {
     @JsonBackReference
     private Set<User> users = new HashSet<>();
 
+    @ManyToMany(mappedBy = "uGroups")
+    private Set<Test> tests = new HashSet<>();
+
     @ManyToMany(mappedBy="uGroups")
     @JsonBackReference
     private Set<Discipline> disciplines = new HashSet<>();

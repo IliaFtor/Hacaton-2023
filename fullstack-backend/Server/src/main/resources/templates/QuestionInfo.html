@@ -4,12 +4,35 @@
   <title>Информация о дисциплине</title>
   <meta charset="utf-8">
   <style>
+    .header {
+      height: 80px;
+      background-color: #3498db;
+      width: 100%;
+    }
+    .header ul {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      margin: 0;
+      list-style-type: none;
+    }
+    .header ul li {
+      background-color: #eee;
+      margin: 2px;
+      padding: 4px;
+      border-radius: 4px;
+    }
+    .header ul li:hover {
+      background-color: #ddd;
+    }
+    main {
+      padding: 20px;
+    }
     body {
       font-family: Arial, sans-serif;
       background-color: #ffffff; /* Белый цвет фона для страницы */
       color: #333333; /* Цвет текста */
       margin: 0;
-      padding: 20px;
       height: 100vh; /* Высота страницы */
     }
 
@@ -41,13 +64,78 @@
     .inline {
       display: inline-block;
     }
+    form {
+      display: block;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    th, td {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    tbody tr:nth-child(even) {
+      background-color: #fcfcfc;
+    }
+
+    tbody tr:hover {
+      background-color: #f2f2f2;
+    }
+
+    input[type="text"] {
+      width: 80px;
+      padding: 5px;
+      margin-right: 5px;
+    }
+
+    button[type="submit"] {
+      padding: 5px 10px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .add-form {
+      margin-bottom: 20px;
+    }
+
+    .add-form input[type="text"] {
+      width: 150px;
+      padding: 8px;
+      margin-right: 10px;
+    }
+
+    .add-form button[type="submit"] {
+      padding: 8px 12px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
   </style>
 </head>
 
 <body>
-<h1>Информация о Вопросе</h1>
+
+<header th:insert="parts/header :: header"></header>
+<main>
+<h1>Question info</h1>
 <div class="question-info" th:if="${question}">
-  <h2>Описание: <span th:text="${question.getQuestionText()}"></span></h2>
+  <h2>Description: <span th:text="${question.getQuestionText()}"></span></h2>
   <h2>In Groups:</h2>
   <ul>
     <li th:each="group : ${question.getQuestionGroups()}" th:text="${group.getQuestionGroupName()}"></li>
@@ -55,17 +143,53 @@
 
   <h2>Ответы:</h2>
   <ul>
-    <li th:each="answer : ${question.getAnswers()}">
-      <form th:action="@{'/' + ${question.getQuestionId()} + '/change-answer/' + ${answer.getAnswerId()}}" method="post">
-        <div class="inline"><span th:text="${answer.getContent()}">  </span><input name="text" type="text" placeholder="Change"><input type="submit" content="Save"></L></div>
-
-      </form>
-      <br>
+    <li >
+      <table>
+        <thead>
+        <tr>
+          <th>Content</th>
+          <th>Score</th>
+          <th>Save btn</th>
+          <th>Delete</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="answer : ${question.getAnswers()}">
+          <form th:action="@{'/' + ${question.getQuestionId()} + '/change-answer/' + ${answer.getAnswerId()}}" method="post">
+            <td>
+              <span th:text="${answer.getContent()}"></span>
+              <input name="text" type="text" placeholder="Change content">
+            </td>
+            <td>
+              <span th:text="${answer.getAnswerScore()}"></span>
+              <input name="score" type="number" placeholder="Change score">
+            </td>
+            <td>
+              <button type="submit">Save</button>
+            </td>
+          </form>
+          <td><form th:action="@{'/' + ${question.getQuestionId()} + '/delete-answer/' + ${answer.getAnswerId()}}" method="post">
+            <button type="submit">Удалить</button>
+          </form></td>
+        </tr>
+        </tbody>
+      </table>
     </li>
+  </ul>
+  <h2>Добавить новый ответ:</h2>
+  <form class="add-form" th:action="@{'/' + ${question.getQuestionId()} + '/add-answer'}" method="post">
+    <input  name="content" type="text" placeholder="Содержание" required>
+    <input  name="score" type="number" placeholder="Оценка" required>
+    <button class="add-sub" type="submit">Добавить</button>
+  </form>
+  In tests:
+  <ul>
+    <li th:each="test : ${question.getTests()}"><a th:href="@{'/test/'+${test.getTestId()}}" th:text="${test.getTestName()}"></a></li>
   </ul>
 </div>
 <div th:unless="${question}">
   <p>Дисциплина не найдена.</p>
 </div>
+</main>
 </body>
 </html>

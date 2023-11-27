@@ -34,6 +34,14 @@ public class Test {
     )
     private Set<Question> questions = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(
+            name="ugroup_tests",
+            joinColumns=@JoinColumn(name="test_id"),
+            inverseJoinColumns = @JoinColumn(name="u_group_id")
+    )
+    private Set<UGroup> uGroups = new HashSet<>();
+
     public Test(String testName, QuestionGroup questionGroup) {
         this.testName = testName;
         this.questionGroup = questionGroup;

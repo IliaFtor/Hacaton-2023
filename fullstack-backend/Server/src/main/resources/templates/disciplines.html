@@ -6,7 +6,25 @@
   <style>
     /* CSS стили */
 
-    ul li:hover {
+    .header {
+      height: 80px;
+      background-color: #3498db;
+      width: 100%;
+    }
+    .header ul {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      margin: 0;
+      list-style-type: none;
+    }
+    .header ul li {
+      background-color: #eee;
+      margin: 2px;
+      padding: 4px;
+      border-radius: 4px;
+    }
+    .header ul li:hover {
       background-color: #ddd;
     }
     html {
@@ -22,24 +40,7 @@
       align-items: center;
       height: 100%;
     }
-    header {
-      height: 80px;
-      background-color: #3498db;
-      width: 100%;
-    }
-    ul {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      margin: 0;
-      list-style-type: none;
-    }
-    li {
-      background-color: #eee;
-      margin: 2px;
-      padding: 4px;
-      border-radius: 4px;
-    }
+
     .container {
       width: 80%;
       margin-top: 20px;
@@ -71,10 +72,8 @@
   </style>
 </head>
 <body>
-<header>
-  <ul th:include="parts/header :: header">
+<header th:include="parts/header :: header" class="header">
 
-  </ul>
 </header>
 
 <div class="container">

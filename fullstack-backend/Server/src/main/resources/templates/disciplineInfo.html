@@ -4,15 +4,37 @@
     <title>Информация о дисциплине</title>
     <meta charset="utf-8">
     <style>
+        .header {
+            height: 80px;
+            background-color: #3498db;
+            width: 100%;
+        }
+        .header ul {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            margin: 0;
+            list-style-type: none;
+        }
+        .header ul li {
+            background-color: #eee;
+            margin: 2px;
+            padding: 4px;
+            border-radius: 4px;
+        }
+        .header ul li:hover {
+            background-color: #ddd;
+        }
         body {
             font-family: Arial, sans-serif;
             background-color: #ffffff; /* Белый цвет фона для страницы */
             color: #333333; /* Цвет текста */
             margin: 0;
-            padding: 20px;
             height: 100vh; /* Высота страницы */
         }
-
+        main {
+            padding: 20px;
+        }
         h1 {
             color: #3498db; /* Синий цвет для заголовка */
         }
@@ -42,6 +64,8 @@
 </head>
 
 <body>
+<header th:insert="parts/header :: header"></header>
+<main>
 <h1>Информация о дисциплине</h1>
 <div class="discipline-info" th:if="${discipline}">
     <h2>Название дисциплины: <span th:text="${discipline.disciplineName}"></span></h2>
@@ -68,5 +92,6 @@
 <div th:unless="${discipline}">
     <p>Дисциплина не найдена.</p>
 </div>
+</main>
 </body>
 </html>
